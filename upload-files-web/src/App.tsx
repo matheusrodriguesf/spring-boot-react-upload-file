@@ -1,10 +1,10 @@
-import { Button } from "@mui/material";
+import UploadFile from "./components/UploadFile";
 
 
 function App() {
   return (
     <div>
-      <Button variant="contained">Hello World</Button>
+      <UploadFile />
     </div>
   );
 }
