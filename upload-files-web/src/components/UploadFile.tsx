@@ -1,17 +1,7 @@
-import React, { Component, ChangeEvent } from "react";
-import {
-    Box,
-    Button,
-    List,
-    ListItem,
-    ListItemText,
-    ListItemSecondaryAction,
-    IconButton,
-    TextField,
-} from "@mui/material";
+import React, { Component, ChangeEvent, DragEvent } from "react";
+import { Box, Button, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, TextField } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-
 import SaveIcon from "@mui/icons-material/Save";
 
 type Props = {};
@@ -22,16 +12,13 @@ type FileWithDescription = {
 };
 
 type State = {
-    selectedFiles: FileWithDescription[] | null;
+    selectedFiles: FileWithDescription[];
 };
 
 class UploadFile extends Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-        this.state = {
-            selectedFiles: null,
-        };
-    }
+    state: State = {
+        selectedFiles: [],
+    };
 
     handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         const selectedFiles = event.target.files;
@@ -41,16 +28,16 @@ class UploadFile extends Component<Props, State> {
                 description: "",
             }));
             this.setState((prevState) => ({
-                selectedFiles: [...(prevState.selectedFiles || []), ...filesWithDescription],
+                selectedFiles: [...prevState.selectedFiles, ...filesWithDescription],
             }));
         }
     };
 
-    handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    handleDragOver = (event: DragEvent<HTMLDivElement>) => {
         event.preventDefault();
     };
 
-    handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    handleDrop = (event: DragEvent<HTMLDivElement>) => {
         event.preventDefault();
         const { files } = event.dataTransfer;
         if (files.length > 0) {
@@ -59,15 +46,14 @@ class UploadFile extends Component<Props, State> {
                 description: "",
             }));
             this.setState((prevState) => ({
-                selectedFiles: [...(prevState.selectedFiles || []), ...filesWithDescription],
+                selectedFiles: [...prevState.selectedFiles, ...filesWithDescription],
             }));
         }
     };
 
     removeFile = (file: FileWithDescription) => {
         this.setState((prevState) => ({
-            selectedFiles:
-                prevState.selectedFiles?.filter((f) => f !== file) || null,
+            selectedFiles: prevState.selectedFiles.filter((f) => f !== file),
         }));
     };
 
@@ -75,16 +61,15 @@ class UploadFile extends Component<Props, State> {
         console.log("Descrição salva:", fileWithDescription.description);
     };
 
-
     handleDescriptionChange = (
         event: ChangeEvent<HTMLInputElement>,
         fileWithDescription: FileWithDescription
     ) => {
         const { value } = event.target;
         this.setState((prevState) => ({
-            selectedFiles: prevState.selectedFiles?.map((f) =>
+            selectedFiles: prevState.selectedFiles.map((f) =>
                 f === fileWithDescription ? { ...f, description: value } : f
-            ) || null,
+            ),
         }));
     };
 
@@ -96,14 +81,15 @@ class UploadFile extends Component<Props, State> {
             event.preventDefault();
             const { value } = event.currentTarget;
             this.setState((prevState) => ({
-                selectedFiles: prevState.selectedFiles?.map((f) =>
+                selectedFiles: prevState.selectedFiles.map((f) =>
                     f === fileWithDescription ? { ...f, description: value } : f
-                ) || null,
+                ),
             }));
         }
     };
 
     render() {
+        const { selectedFiles } = this.state;
         return (
             <Box
                 m={2}
@@ -118,11 +104,7 @@ class UploadFile extends Component<Props, State> {
                 onDrop={this.handleDrop}
             >
                 <label htmlFor="upload-image">
-                    <Button
-                        variant="outlined"
-                        component="div"
-                        startIcon={<CloudUploadIcon />}
-                    >
+                    <Button variant="outlined" component="div" startIcon={<CloudUploadIcon />}>
                         Anexar Arquivos
                     </Button>
                 </label>
@@ -134,9 +116,9 @@ class UploadFile extends Component<Props, State> {
                     multiple
                     onChange={this.handleFileChange}
                 />
-                {this.state.selectedFiles && this.state.selectedFiles.length > 0 && (
+                {selectedFiles.length > 0 && (
                     <List>
-                        {this.state.selectedFiles.map((fileWithDescription, index) => (
+                        {selectedFiles.map((fileWithDescription, index) => (
                             <ListItem key={index}>
                                 <ListItemText primary={fileWithDescription.file.name} />
                                 <TextField
