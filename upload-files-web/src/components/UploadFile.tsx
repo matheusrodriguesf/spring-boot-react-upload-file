@@ -1,4 +1,4 @@
-import React, { Component, ChangeEvent, KeyboardEvent } from "react";
+import React, { Component, ChangeEvent } from "react";
 import {
     Box,
     Button,
@@ -11,6 +11,8 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+
+import SaveIcon from "@mui/icons-material/Save";
 
 type Props = {};
 
@@ -68,6 +70,11 @@ class UploadFile extends Component<Props, State> {
                 prevState.selectedFiles?.filter((f) => f !== file) || null,
         }));
     };
+
+    saveDescription = (fileWithDescription: FileWithDescription) => {
+        console.log("Descrição salva:", fileWithDescription.description);
+    };
+
 
     handleDescriptionChange = (
         event: ChangeEvent<HTMLInputElement>,
@@ -151,6 +158,13 @@ class UploadFile extends Component<Props, State> {
                                         onClick={() => this.removeFile(fileWithDescription)}
                                     >
                                         <DeleteIcon />
+                                    </IconButton>
+                                    <IconButton
+                                        edge="end"
+                                        aria-label="save"
+                                        onClick={() => this.saveDescription(fileWithDescription)}
+                                    >
+                                        <SaveIcon />
                                     </IconButton>
                                 </ListItemSecondaryAction>
                             </ListItem>
