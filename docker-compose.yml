@@ -1,0 +1,17 @@
+version: '3'
+services:
+  bookstore-db:
+    image: postgres
+    container_name: file-db
+    environment:
+      - POSTGRES_PASSWORD=file123
+      - POSTGRES_USER=file
+      - POSTGRES_DB=file
+    ports:
+      - 5432:5432
+    networks:
+      - postgres-network         
+
+networks:
+  postgres-network:
+    driver: bridge

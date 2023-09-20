@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: upload-download-file
+  datasource:  
+     driver-class-name: org.postgresql.Driver
+     url: jdbc:postgresql://localhost:5432/file
+     username: file
+     password: file123
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+folder-path: /tmp/
