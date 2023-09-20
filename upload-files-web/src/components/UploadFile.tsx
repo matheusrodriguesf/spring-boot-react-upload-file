@@ -13,23 +13,41 @@ type FileWithDescription = {
 
 type State = {
     selectedFiles: FileWithDescription[];
+    errorMessage: string | null;
 };
 
 class UploadFile extends Component<Props, State> {
     state: State = {
         selectedFiles: [],
+        errorMessage: null,
     };
 
     handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         const selectedFiles = event.target.files;
         if (selectedFiles) {
+
+            if (selectedFiles.length + this.state.selectedFiles.length > 5) {
+                this.setState({ errorMessage: "Você pode anexar no máximo 5 arquivos." });
+                return;
+            }
+
             const filesWithDescription = Array.from(selectedFiles).map((file) => ({
                 file,
                 description: "",
             }));
-            this.setState((prevState) => ({
-                selectedFiles: [...prevState.selectedFiles, ...filesWithDescription],
-            }));
+            const maxSizeBytes = 5 * 1024 * 1024;
+
+            const validFiles = filesWithDescription.filter((file) => file.file.size <= maxSizeBytes);
+            const invalidFiles = filesWithDescription.filter((file) => file.file.size > maxSizeBytes);
+
+            if (invalidFiles.length > 0) {
+                this.setState({ errorMessage: "Alguns arquivos são maiores que 5MB e não foram anexados." });
+            } else {
+                this.setState((prevState) => ({
+                    selectedFiles: [...prevState.selectedFiles, ...validFiles],
+                    errorMessage: null,
+                }));
+            }
         }
     };
 
@@ -88,6 +106,10 @@ class UploadFile extends Component<Props, State> {
         }
     };
 
+    handleUploadClick = () => {
+        console.log("Arquivos e descrições enviados:", this.state.selectedFiles);
+    };
+
     render() {
         const { selectedFiles } = this.state;
         return (
@@ -111,47 +133,59 @@ class UploadFile extends Component<Props, State> {
                 <input
                     id="upload-image"
                     hidden
-                    accept="image/*"
+                    accept="image/*,.pdf"
                     type="file"
                     multiple
                     onChange={this.handleFileChange}
                 />
                 {selectedFiles.length > 0 && (
-                    <List>
-                        {selectedFiles.map((fileWithDescription, index) => (
-                            <ListItem key={index}>
-                                <ListItemText primary={fileWithDescription.file.name} />
-                                <TextField
-                                    label="Descrição"
-                                    variant="outlined"
-                                    size="small"
-                                    value={fileWithDescription.description}
-                                    onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                                        this.handleDescriptionChange(event, fileWithDescription)
-                                    }
-                                    onKeyUp={(event: React.KeyboardEvent<HTMLInputElement>) =>
-                                        this.handleDescriptionKeyUp(event, fileWithDescription)
-                                    }
-                                />
-                                <ListItemSecondaryAction>
-                                    <IconButton
-                                        edge="end"
-                                        aria-label="delete"
-                                        onClick={() => this.removeFile(fileWithDescription)}
-                                    >
-                                        <DeleteIcon />
-                                    </IconButton>
-                                    <IconButton
-                                        edge="end"
-                                        aria-label="save"
-                                        onClick={() => this.saveDescription(fileWithDescription)}
-                                    >
-                                        <SaveIcon />
-                                    </IconButton>
-                                </ListItemSecondaryAction>
-                            </ListItem>
-                        ))}
-                    </List>
+                    <div>
+                        <List>
+                            {selectedFiles.map((fileWithDescription, index) => (
+                                <ListItem key={index}>
+                                    <ListItemText primary={fileWithDescription.file.name} />
+                                    <TextField
+                                        label="Descrição"
+                                        variant="outlined"
+                                        size="small"
+                                        value={fileWithDescription.description}
+                                        onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                                            this.handleDescriptionChange(event, fileWithDescription)
+                                        }
+                                        onKeyUp={(event: React.KeyboardEvent<HTMLInputElement>) =>
+                                            this.handleDescriptionKeyUp(event, fileWithDescription)
+                                        }
+                                    />
+                                    <ListItemSecondaryAction>
+                                        <IconButton
+                                            edge="end"
+                                            aria-label="delete"
+                                            onClick={() => this.removeFile(fileWithDescription)}
+                                        >
+                                            <DeleteIcon />
+                                        </IconButton>
+                                        <IconButton
+                                            edge="end"
+                                            aria-label="save"
+                                            onClick={() => this.saveDescription(fileWithDescription)}
+                                        >
+                                            <SaveIcon />
+                                        </IconButton>
+                                    </ListItemSecondaryAction>
+                                </ListItem>
+                            ))}
+                        </List>
+                        <div style={{ display: "flex", justifyContent: "center" }}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={this.handleUploadClick}
+                            >
+                                Enviar
+                            </Button>
+                        </div>
+
+                    </div>
                 )}
             </Box>
         );
