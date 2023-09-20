@@ -3,6 +3,7 @@ import { Box, Button, List, ListItem, ListItemText, ListItemSecondaryAction, Ico
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import SaveIcon from "@mui/icons-material/Save";
+import UploadDownloadService from "../service/UploadDownloadService";
 
 type Props = {};
 
@@ -17,6 +18,9 @@ type State = {
 };
 
 class UploadFile extends Component<Props, State> {
+
+    private readonly uploadService = new UploadDownloadService();
+
     state: State = {
         selectedFiles: [],
         errorMessage: null,
@@ -107,8 +111,46 @@ class UploadFile extends Component<Props, State> {
     };
 
     handleUploadClick = () => {
-        console.log("Arquivos e descrições enviados:", this.state.selectedFiles);
+        const { selectedFiles } = this.state;
+
+        const uploadPromises = selectedFiles.map((fileWithDescription) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+
+                reader.onload = (e) => {
+                    const result = e.target?.result;
+                    if (typeof result === 'string') {
+                        const base64Data = result.split(',')[1];
+                        resolve({ base64Data, description: fileWithDescription.description });
+                    } else {
+                        reject(new Error('Erro ao ler o arquivo como Base64.'));
+                    }
+                };
+
+                reader.onerror = (error) => {
+                    reject(error);
+                };
+
+                reader.readAsDataURL(fileWithDescription.file);
+            });
+        });
+
+        Promise.all(uploadPromises)
+            .then((filesAsBase64) => {
+                this.uploadService.uploadFiles(filesAsBase64);
+            })
+            .catch((error) => {
+                console.error('Erro ao converter arquivos para Base64:', error);
+            });
     };
+
+
+
+
+
+
+
+
 
     render() {
         const { selectedFiles } = this.state;
