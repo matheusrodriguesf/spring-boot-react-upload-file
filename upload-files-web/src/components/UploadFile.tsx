@@ -121,7 +121,7 @@ class UploadFile extends Component<Props, State> {
                     const result = e.target?.result;
                     if (typeof result === 'string') {
                         const base64Data = result.split(',')[1];
-                        resolve({ base64Data, description: fileWithDescription.description });
+                        resolve({ base64Data, description: fileWithDescription.description, filename: fileWithDescription.file.name });
                     } else {
                         reject(new Error('Erro ao ler o arquivo como Base64.'));
                     }

@@ -14,7 +14,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FileWithDescription {
 
+    String filename;
     String base64Data;
     String description;
-
 }
