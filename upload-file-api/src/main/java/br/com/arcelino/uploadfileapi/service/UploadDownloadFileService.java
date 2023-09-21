@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import br.com.arcelino.uploadfileapi.api.FileWithDescription;
+import br.com.arcelino.uploadfileapi.api.FileWithDescriptionResponse;
 import br.com.arcelino.uploadfileapi.entity.ArquivoAnexo;
 import br.com.arcelino.uploadfileapi.repository.ArquivoAnexoRepository;
 import jakarta.transaction.Transactional;
@@ -19,9 +20,13 @@ import lombok.RequiredArgsConstructor;
 public class UploadDownloadFileService {
 
     private static final String DIRETORIO_ANEXO = "anexos";
-    
+
     private final ArquivoAnexoRepository arquivoAnexoRepository;
     private final ArquivoService arquivoService;
+
+    public List<FileWithDescriptionResponse> all() {
+        return arquivoAnexoRepository.findAllProjectedBy();
+    }
 
     @Transactional
     public void uploadFile(List<FileWithDescription> filesWithDescription) {

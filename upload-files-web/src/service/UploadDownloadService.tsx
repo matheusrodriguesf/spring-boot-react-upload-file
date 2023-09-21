@@ -1,3 +1,5 @@
+import FileWithDescriptionResponse from "../api/FileWithDescriptionResponse";
+
 class UploadDownloadService {
     private static readonly staticUrl = 'http://localhost:8080/files';
 
@@ -15,6 +17,17 @@ class UploadDownloadService {
         }
 
     }
+
+    async all(): Promise<FileWithDescriptionResponse[]> {
+        const response = await fetch(`${UploadDownloadService.staticUrl}/all`);
+
+        if (!response.ok) {
+            throw new Error('Erro ao buscar arquivos.');
+        }
+
+        return response.json();
+    }
+
 }
 
 export default UploadDownloadService;
